@@ -1,13 +1,13 @@
 services:
   app:
     container_name: conceptualizer-app
-    hostname: conceptualizer-app
+    hostname: ${APP_HOST}
     build: .
     ports:
       - "3000:3000"
     environment:
       DB_HOST: conceptualizer-db
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@conceptualizer-db:5432/${POSTGRES_DB}
+      DATABASE_URL: ${DATABASE_URL}
       AUTH_PASSWORD: ${AUTH_PASSWORD}
       AUTH_SECRET: ${AUTH_SECRET}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
@@ -22,7 +22,7 @@ services:
 
   db:
     container_name: conceptualizer-db
-    hostname: conceptualizer-db
+    hostname: ${DB_HOST}
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
