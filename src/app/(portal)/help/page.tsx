@@ -21,20 +21,32 @@ export default function HelpPage() {
         </Section>
 
         <Section title="Customers">
-          <SubSection title="Importing from HubSpot">
+          <SubSection title="Adding customers manually">
             <p>
-              Click <Strong>Import from HubSpot</Strong> on the Customers page to open the import dialog.
-              You can search for companies by name. Select one or more companies and click <Strong>Import</Strong>.
+              Click <Strong>Add Customer</Strong> on the Customers page to create a company by entering
+              its name, domain, and industry. Contacts and deals can then be added from the customer detail page.
             </p>
+          </SubSection>
+          <SubSection title="Importing from a HubSpot CSV export">
+            <p>
+              Click <Strong>Import CSV</Strong> to import companies, contacts, or deals from a HubSpot CSV export.
+              Export data from HubSpot via <em>CRM → [Object] → Actions → Export</em>, then upload the file here.
+              Import in this order:
+            </p>
+            <ol className="list-decimal list-inside space-y-1 mt-2">
+              <li>Companies — creates or updates customer records by HubSpot Record ID</li>
+              <li>Contacts — matched to companies via the Associated Company ID column</li>
+              <li>Deals — matched to companies via the Associated Company ID column</li>
+            </ol>
             <p className="mt-2">
-              Importing a company will also pull in all associated contacts and deals from HubSpot.
-              Re-importing a company that already exists will update it with the latest HubSpot data.
+              Re-importing a file that was already imported will update existing records rather than create duplicates.
             </p>
           </SubSection>
           <SubSection title="Customer detail">
             <p>
-              Click a company name to view its detail page, which shows all synced contacts, deals,
-              and linked projects.
+              Click a company name to view its detail page. From here you can add or remove contacts and deals,
+              and see all linked projects. Use the <Strong>Delete</Strong> button to permanently remove a customer
+              along with all its contacts, deals, and projects.
             </p>
           </SubSection>
         </Section>

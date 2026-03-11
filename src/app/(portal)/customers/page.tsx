@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import ImportDialog from "./ImportDialog";
+import AddCustomerDialog from "./AddCustomerDialog";
+import CsvImportDialog from "./CsvImportDialog";
 
 export default async function CustomersPage() {
   const customers = await db.customer.findMany({
@@ -15,14 +16,17 @@ export default async function CustomersPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#1c1e3b]">Customers</h1>
-          <p className="text-gray-500 mt-1 text-sm">{customers.length} companies synced from HubSpot</p>
+          <p className="text-gray-500 mt-1 text-sm">{customers.length} companies</p>
         </div>
-        <ImportDialog />
+        <div className="flex gap-2">
+          <AddCustomerDialog />
+          <CsvImportDialog />
+        </div>
       </div>
 
       {customers.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
-          No customers yet. Click &ldquo;Sync HubSpot&rdquo; to import.
+          No customers yet. Add one manually or import a HubSpot CSV export.
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">

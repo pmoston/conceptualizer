@@ -8,7 +8,7 @@ datasource db {
 
 model Customer {
   id          String    @id @default(cuid())
-  hubspotId   String    @unique
+  hubspotId   String?   @unique
   name        String
   domain      String?
   industry    String?
@@ -21,7 +21,7 @@ model Customer {
 
 model Contact {
   id          String   @id @default(cuid())
-  hubspotId   String   @unique
+  hubspotId   String?  @unique
   firstName   String
   lastName    String
   email       String?
@@ -34,7 +34,7 @@ model Contact {
 
 model Deal {
   id           String     @id @default(cuid())
-  hubspotId    String     @unique
+  hubspotId    String?    @unique
   name         String
   stage        String?
   amount       Float?

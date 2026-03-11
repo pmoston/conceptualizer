@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.58",
-    "@hubspot/api-client": "^13.4.0",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.4.2",
     "@types/pg": "^8.18.0",
