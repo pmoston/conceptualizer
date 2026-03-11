@@ -5,6 +5,7 @@ import { Plus, Trash2, X, Loader2, Mail, Briefcase, ExternalLink } from "lucide-
 
 interface Contact {
   id: string;
+  academicTitle: string | null;
   firstName: string;
   lastName: string;
   email: string | null;
@@ -26,7 +27,7 @@ export default function ContactActions({
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", jobTitle: "", hubspotId: "" });
+  const [form, setForm] = useState({ academicTitle: "", firstName: "", lastName: "", email: "", jobTitle: "", hubspotId: "" });
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -37,6 +38,7 @@ export default function ContactActions({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          academicTitle: form.academicTitle || null,
           firstName: form.firstName,
           lastName: form.lastName,
           email: form.email || null,
@@ -47,7 +49,7 @@ export default function ContactActions({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setShowAdd(false);
-      setForm({ firstName: "", lastName: "", email: "", jobTitle: "", hubspotId: "" });
+      setForm({ academicTitle: "", firstName: "", lastName: "", email: "", jobTitle: "", hubspotId: "" });
       router.refresh();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed");
@@ -80,7 +82,9 @@ export default function ContactActions({
           <div key={c.id} className="py-3 flex items-start justify-between group">
             <div>
               <div className="flex items-center gap-2">
-                <p className="font-medium text-sm text-[#1c1e3b]">{c.firstName} {c.lastName}</p>
+                <p className="font-medium text-sm text-[#1c1e3b]">
+                  {c.academicTitle && <span className="text-gray-400 font-normal">{c.academicTitle} </span>}{c.firstName} {c.lastName}
+                </p>
                 {c.hubspotId && portalId && (
                   <a href={`https://app.hubspot.com/contacts/${portalId}/contact/${c.hubspotId}`}
                     target="_blank" rel="noopener noreferrer"
@@ -108,6 +112,12 @@ export default function ContactActions({
 
       {showAdd && (
         <form onSubmit={handleAdd} className="mt-3 pt-3 border-t border-gray-100 space-y-3">
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Academic title</label>
+            <input value={form.academicTitle} onChange={e => setForm(f => ({ ...f, academicTitle: e.target.value }))}
+              placeholder="e.g. Dr., Prof."
+              className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#b3cc26]" />
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-gray-500 mb-1">First name *</label>

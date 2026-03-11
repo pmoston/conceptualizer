@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 
 const Schema = z.object({
+  academicTitle: z.string().optional().nullable(),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   email: z.string().email().optional().nullable(),

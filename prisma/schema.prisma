@@ -21,11 +21,12 @@ model Customer {
 
 model Contact {
   id          String   @id @default(cuid())
-  hubspotId   String?  @unique
-  firstName   String
-  lastName    String
-  email       String?
-  jobTitle    String?
+  hubspotId     String?  @unique
+  academicTitle String?
+  firstName     String
+  lastName      String
+  email         String?
+  jobTitle      String?
   customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId  String
   createdAt   DateTime @default(now())
