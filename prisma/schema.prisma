@@ -13,6 +13,7 @@ model Customer {
   domain      String?
   industry    String?
   contacts    Contact[]
+  deals       Deal[]
   projects    Project[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -31,6 +32,22 @@ model Contact {
   updatedAt   DateTime @updatedAt
 }
 
+model Deal {
+  id           String     @id @default(cuid())
+  hubspotId    String     @unique
+  name         String
+  stage        String?
+  amount       Float?
+  currency     String?
+  closeDate    DateTime?
+  ownerName    String?
+  customer     Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId   String
+  projects     Project[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
 model Project {
   id          String        @id @default(cuid())
   title       String
@@ -39,6 +56,8 @@ model Project {
   description String?
   customer    Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId  String
+  deal        Deal?         @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  dealId      String?
   documents   Document[]
   agentRuns   AgentRun[]
   createdAt   DateTime      @default(now())
