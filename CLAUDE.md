@@ -37,11 +37,11 @@ npm run db:studio    # Open Prisma Studio
 npm run db:seed      # Seed initial data
 
 # Podman
-podman compose up -d              # Start all services (app + postgres)
-podman compose down               # Stop services
-podman compose logs -f app        # Follow app logs
-podman ps                         # List running containers
-podman logs conceptualizer-app    # App container logs
+podman compose -p conceptualizer up -d          # Start all services (app + postgres)
+podman compose -p conceptualizer down           # Stop services
+podman compose -p conceptualizer logs -f app    # Follow app logs
+podman ps                                       # List running containers
+podman logs conceptualizer-app                  # App container logs
 ```
 
 ## Architecture
