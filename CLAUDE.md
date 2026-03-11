@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - All code, UI, and comments must be in **English**
 - Project content (concepts, documents) is produced in the **project language** (German or English)
-- Hosted locally in Docker; source maintained in this GitHub repo
+- Hosted locally in Podman; source maintained in this GitHub repo
 
 ## Tech Stack
 
@@ -16,10 +16,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 |---|---|
 | Framework | Next.js (App Router, TypeScript) |
 | Database | PostgreSQL |
-| File storage | Local filesystem (Docker volume) |
+| File storage | Local filesystem (Podman volume) |
 | AI agents | Claude API via Vercel AI SDK |
 | Auth | Single-user, simple password protection |
-| Deployment | Docker Compose (local) |
+| Deployment | Podman Compose (local) |
 
 ## Commands
 
@@ -36,10 +36,12 @@ npm run db:migrate   # Run Prisma migrations
 npm run db:studio    # Open Prisma Studio
 npm run db:seed      # Seed initial data
 
-# Docker
-docker compose up -d         # Start all services (app + postgres)
-docker compose down          # Stop services
-docker compose logs -f app   # Follow app logs
+# Podman
+podman compose up -d              # Start all services (app + postgres)
+podman compose down               # Stop services
+podman compose logs -f app        # Follow app logs
+podman ps                         # List running containers
+podman logs conceptualizer-app    # App container logs
 ```
 
 ## Architecture
