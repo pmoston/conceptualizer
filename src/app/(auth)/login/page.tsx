@@ -1,4 +1,10 @@
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1c1e3b]">
       <div className="bg-white rounded-2xl shadow-xl p-10 w-full max-w-sm">
@@ -6,6 +12,9 @@ export default function LoginPage() {
           <img src="/brand/dataciders_primär_dunkel.svg" alt="Dataciders" className="h-10 mx-auto mb-4" />
           <h1 className="text-xl font-semibold text-[#1c1e3b]">Conceptualizer</h1>
         </div>
+        {error && (
+          <p className="mb-4 text-sm text-red-600 text-center">Incorrect password. Please try again.</p>
+        )}
         <form action="/api/auth/login" method="POST" className="space-y-4">
           <input
             type="password"
