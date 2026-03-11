@@ -13,6 +13,8 @@ services:
       HUBSPOT_API_KEY: ${HUBSPOT_API_KEY}
     volumes:
       - uploads:/app/uploads
+    networks:
+      - conceptualizer-net
     depends_on:
       db:
         condition: service_healthy
@@ -27,11 +29,18 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - conceptualizer-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+networks:
+  conceptualizer-net:
+    name: ${DOCKER_NETWORK:-conceptualizer-net}
+    driver: bridge
 
 volumes:
   pgdata:
