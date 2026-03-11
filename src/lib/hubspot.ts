@@ -1,67 +1,91 @@
 import { Client } from "@hubspot/api-client";
+import { FilterOperatorEnum } from "@hubspot/api-client/lib/codegen/crm/companies/models/Filter";
 import { db } from "@/lib/db";
 
 export const hubspot = new Client({
   accessToken: process.env.HUBSPOT_API_KEY,
 });
 
-export async function syncCompanies() {
-  let after: string | undefined;
-  let synced = 0;
+// --- Browse (read-only, no DB writes) ---
 
-  do {
-    const response = await hubspot.crm.companies.basicApi.getPage(
-      100,
-      after,
-      ["name", "domain", "industry"],
-    );
+export async function browseCompanies(search?: string) {
+  if (search) {
+    const response = await hubspot.crm.companies.searchApi.doSearch({
+      filterGroups: [],
+      query: search,
+      properties: ["name", "domain", "industry"],
+      limit: 50,
+      after: "0",
+      sorts: [],
+    });
+    return response.results.map((c) => ({
+      hubspotId: c.id,
+      name: c.properties.name ?? "Unknown",
+      domain: c.properties.domain ?? null,
+      industry: c.properties.industry ?? null,
+    }));
+  }
 
-    for (const company of response.results) {
-      await db.customer.upsert({
-        where: { hubspotId: company.id },
-        update: {
-          name: company.properties.name ?? "Unknown",
-          domain: company.properties.domain ?? null,
-          industry: company.properties.industry ?? null,
-        },
-        create: {
-          hubspotId: company.id,
-          name: company.properties.name ?? "Unknown",
-          domain: company.properties.domain ?? null,
-          industry: company.properties.industry ?? null,
-        },
-      });
-      synced++;
-    }
-
-    after = response.paging?.next?.after;
-  } while (after);
-
-  return synced;
+  const response = await hubspot.crm.companies.basicApi.getPage(
+    100, undefined, ["name", "domain", "industry"]
+  );
+  return response.results.map((c) => ({
+    hubspotId: c.id,
+    name: c.properties.name ?? "Unknown",
+    domain: c.properties.domain ?? null,
+    industry: c.properties.industry ?? null,
+  }));
 }
 
-export async function syncContacts() {
-  let after: string | undefined;
-  let synced = 0;
+// --- Selective import ---
 
-  do {
-    const response = await hubspot.crm.contacts.basicApi.getPage(
-      100,
-      after,
-      ["firstname", "lastname", "email", "jobtitle"],
-      undefined,
-      ["associations.company"],
+async function fetchOwnerMap() {
+  const response = await hubspot.crm.owners.ownersApi.getPage(undefined, undefined, 100);
+  return new Map(
+    response.results.map((o) => [o.id, `${o.firstName ?? ""} ${o.lastName ?? ""}`.trim()])
+  );
+}
+
+export async function importCompanies(hubspotIds: string[]) {
+  const ownerMap = await fetchOwnerMap();
+  let imported = 0;
+
+  for (const hubspotId of hubspotIds) {
+    const company = await hubspot.crm.companies.basicApi.getById(
+      hubspotId, ["name", "domain", "industry"]
     );
 
-    for (const contact of response.results) {
-      const companyId = contact.associations?.companies?.results?.[0]?.id;
-      if (!companyId) continue;
+    await db.customer.upsert({
+      where: { hubspotId },
+      update: {
+        name: company.properties.name ?? "Unknown",
+        domain: company.properties.domain ?? null,
+        industry: company.properties.industry ?? null,
+      },
+      create: {
+        hubspotId,
+        name: company.properties.name ?? "Unknown",
+        domain: company.properties.domain ?? null,
+        industry: company.properties.industry ?? null,
+      },
+    });
 
-      const customer = await db.customer.findUnique({
-        where: { hubspotId: companyId },
-      });
-      if (!customer) continue;
+    // Import contacts for this company
+    const contacts = await hubspot.crm.contacts.searchApi.doSearch({
+      filterGroups: [{
+        filters: [{ propertyName: "associatedcompanyid", operator: FilterOperatorEnum.Eq, value: hubspotId }],
+      }],
+      properties: ["firstname", "lastname", "email", "jobtitle"],
+      limit: 100,
+      after: "0",
+      sorts: [],
+      query: "",
+    });
 
+    const customer = await db.customer.findUnique({ where: { hubspotId } });
+    if (!customer) continue;
+
+    for (const contact of contacts.results) {
       await db.contact.upsert({
         where: { hubspotId: contact.id },
         update: {
@@ -80,46 +104,21 @@ export async function syncContacts() {
           customerId: customer.id,
         },
       });
-      synced++;
     }
 
-    after = response.paging?.next?.after;
-  } while (after);
+    // Import deals for this company
+    const deals = await hubspot.crm.deals.searchApi.doSearch({
+      filterGroups: [{
+        filters: [{ propertyName: "associations.company", operator: FilterOperatorEnum.Eq, value: hubspotId }],
+      }],
+      properties: ["dealname", "dealstage", "amount", "currency", "closedate", "hubspot_owner_id"],
+      limit: 100,
+      after: "0",
+      sorts: [],
+      query: "",
+    });
 
-  return synced;
-}
-
-export async function syncDeals() {
-  let after: string | undefined;
-  let synced = 0;
-
-  // Fetch owners once for name resolution
-  const ownersResponse = await hubspot.crm.owners.ownersApi.getPage(undefined, undefined, 100);
-  const ownerMap = new Map(
-    ownersResponse.results.map((o) => [
-      o.id,
-      `${o.firstName ?? ""} ${o.lastName ?? ""}`.trim(),
-    ])
-  );
-
-  do {
-    const response = await hubspot.crm.deals.basicApi.getPage(
-      100,
-      after,
-      ["dealname", "dealstage", "amount", "currency", "closedate", "hubspot_owner_id"],
-      undefined,
-      ["associations.company"],
-    );
-
-    for (const deal of response.results) {
-      const companyId = deal.associations?.companies?.results?.[0]?.id;
-      if (!companyId) continue;
-
-      const customer = await db.customer.findUnique({
-        where: { hubspotId: companyId },
-      });
-      if (!customer) continue;
-
+    for (const deal of deals.results) {
       const ownerName = deal.properties.hubspot_owner_id
         ? (ownerMap.get(deal.properties.hubspot_owner_id) ?? null)
         : null;
@@ -146,11 +145,10 @@ export async function syncDeals() {
           customerId: customer.id,
         },
       });
-      synced++;
     }
 
-    after = response.paging?.next?.after;
-  } while (after);
+    imported++;
+  }
 
-  return synced;
+  return imported;
 }

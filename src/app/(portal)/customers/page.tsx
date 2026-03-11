@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import SyncButton from "./SyncButton";
+import ImportDialog from "./ImportDialog";
 
 export default async function CustomersPage() {
   const customers = await db.customer.findMany({
@@ -17,7 +17,7 @@ export default async function CustomersPage() {
           <h1 className="text-2xl font-bold text-[#1c1e3b]">Customers</h1>
           <p className="text-gray-500 mt-1 text-sm">{customers.length} companies synced from HubSpot</p>
         </div>
-        <SyncButton />
+        <ImportDialog />
       </div>
 
       {customers.length === 0 ? (
