@@ -54,7 +54,7 @@ export default async function ProjectDetailPage({
               {languageLabels[project.language]}
             </span>
           </div>
-          {project.description && <p className="text-sm text-gray-500 mt-3 max-w-xl">{project.description}</p>}
+          {project.description && <p className="text-sm text-gray-500 mt-3 max-w-xl whitespace-pre-wrap">{project.description}</p>}
         </div>
         <div className="flex items-center gap-2">
           <EditProjectDialog
