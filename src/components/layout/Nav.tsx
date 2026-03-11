@@ -1,19 +1,20 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, FolderOpen, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, FolderOpen, HelpCircle, LogOut } from "lucide-react";
 
 const links = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/customers", label: "Customers", icon: Users },
   { href: "/projects", label: "Projects", icon: FolderOpen },
+  { href: "/help", label: "Help", icon: HelpCircle },
 ];
 
 export default function Nav() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-56 bg-[#1c1e3b] flex flex-col min-h-screen">
+    <aside className="w-56 bg-[#1c1e3b] flex flex-col h-full shrink-0">
       <div className="px-6 py-6 border-b border-white/10">
         <img src="/brand/dataciders_primär_weiß.svg" alt="Dataciders" className="h-8" />
       </div>

@@ -8,7 +8,7 @@ datasource db {
 
 model Customer {
   id          String    @id @default(cuid())
-  hubspotId   String    @unique
+  hubspotId   String?   @unique
   name        String
   domain      String?
   industry    String?
@@ -21,11 +21,12 @@ model Customer {
 
 model Contact {
   id          String   @id @default(cuid())
-  hubspotId   String   @unique
-  firstName   String
-  lastName    String
-  email       String?
-  jobTitle    String?
+  hubspotId     String?  @unique
+  academicTitle String?
+  firstName     String
+  lastName      String
+  email         String?
+  jobTitle      String?
   customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId  String
   createdAt   DateTime @default(now())
@@ -34,7 +35,7 @@ model Contact {
 
 model Deal {
   id           String     @id @default(cuid())
-  hubspotId    String     @unique
+  hubspotId    String?    @unique
   name         String
   stage        String?
   amount       Float?
@@ -71,6 +72,9 @@ model Document {
   filePath    String
   mimeType    String
   sizeBytes   Int
+  previewPath  String?
+  previewError String?
+  ocrText      String?
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId   String
   createdAt   DateTime     @default(now())
@@ -83,10 +87,22 @@ model AgentRun {
   input       Json
   output      String?
   error       String?
+  steps       AgentStep[]
   project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId   String
   startedAt   DateTime    @default(now())
   completedAt DateTime?
+}
+
+model AgentStep {
+  id        String   @id @default(cuid())
+  runId     String
+  run       AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  index     Int
+  type      StepType
+  label     String
+  content   String?
+  createdAt DateTime @default(now())
 }
 
 enum Language {
@@ -113,4 +129,14 @@ enum AgentStatus {
   RUNNING
   COMPLETED
   FAILED
+}
+
+enum StepType {
+  INFO
+  AGENT_CALL
+  AGENT_OUTPUT
+  TOOL_CALL
+  TOOL_RESULT
+  WARNING
+  ERROR
 }
