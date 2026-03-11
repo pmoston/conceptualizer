@@ -1,12 +1,13 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, FolderOpen, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, FolderOpen, HelpCircle, LogOut } from "lucide-react";
 
 const links = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/customers", label: "Customers", icon: Users },
   { href: "/projects", label: "Projects", icon: FolderOpen },
+  { href: "/help", label: "Help", icon: HelpCircle },
 ];
 
 export default function Nav() {
