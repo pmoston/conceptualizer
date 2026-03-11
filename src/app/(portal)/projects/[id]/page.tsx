@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { ArrowLeft } from "lucide-react";
 import { ProjectStatus, Language } from "@prisma/client";
 import ProjectActions from "./ProjectActions";
+import EditProjectDialog from "./EditProjectDialog";
 
 const statusColors: Record<ProjectStatus, string> = {
   DRAFT: "bg-gray-100 text-gray-500",
@@ -23,7 +24,7 @@ export default async function ProjectDetailPage({
   const project = await db.project.findUnique({
     where: { id },
     include: {
-      customer: true,
+      customer: { include: { deals: { orderBy: { name: "asc" } } } },
       deal: true,
       documents: { orderBy: { createdAt: "desc" } },
       agentRuns: { orderBy: { startedAt: "desc" } },
@@ -55,7 +56,13 @@ export default async function ProjectDetailPage({
           </div>
           {project.description && <p className="text-sm text-gray-500 mt-3 max-w-xl">{project.description}</p>}
         </div>
-        <ProjectActions project={{ id: project.id, status: project.status }} />
+        <div className="flex items-center gap-2">
+          <EditProjectDialog
+            project={{ id: project.id, title: project.title, language: project.language, description: project.description, dealId: project.dealId }}
+            deals={project.customer.deals ?? []}
+          />
+          <ProjectActions project={{ id: project.id, status: project.status }} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
