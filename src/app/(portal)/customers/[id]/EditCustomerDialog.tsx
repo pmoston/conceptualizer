@@ -1,29 +1,48 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { X, Loader2, Plus } from "lucide-react";
+import { Pencil, X, Loader2 } from "lucide-react";
 
-export default function AddCustomerDialog() {
+interface Props {
+  customer: {
+    id: string;
+    name: string;
+    domain: string | null;
+    industry: string | null;
+    hubspotId: string | null;
+  };
+}
+
+export default function EditCustomerDialog({ customer }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", domain: "", industry: "", hubspotId: "" });
+  const [form, setForm] = useState({
+    name: customer.name,
+    domain: customer.domain ?? "",
+    industry: customer.industry ?? "",
+    hubspotId: customer.hubspotId ?? "",
+  });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch("/api/customers", {
-        method: "POST",
+      const res = await fetch(`/api/customers/${customer.id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, domain: form.domain || null, industry: form.industry || null, hubspotId: form.hubspotId || null }),
+        body: JSON.stringify({
+          name: form.name,
+          domain: form.domain || null,
+          industry: form.industry || null,
+          hubspotId: form.hubspotId || null,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setOpen(false);
-      setForm({ name: "", domain: "", industry: "", hubspotId: "" });
       router.refresh();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to save");
@@ -34,19 +53,16 @@ export default function AddCustomerDialog() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="flex items-center gap-2 bg-white border border-gray-200 text-[#1c1e3b] text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition"
-      >
-        <Plus size={14} />
-        Add Customer
+      <button onClick={() => setOpen(true)}
+        className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-[#1c1e3b] border border-gray-200 hover:border-gray-300 px-3 py-1.5 rounded-lg transition">
+        <Pencil size={14} /> Edit
       </button>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h2 className="font-semibold text-[#1c1e3b]">Add Customer</h2>
+              <h2 className="font-semibold text-[#1c1e3b]">Edit Customer</h2>
               <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-[#1c1e3b]"><X size={18} /></button>
             </div>
             <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
@@ -78,7 +94,7 @@ export default function AddCustomerDialog() {
                 <button type="submit" disabled={saving}
                   className="flex items-center gap-2 bg-[#b3cc26] text-[#1c1e3b] font-semibold text-sm px-5 py-2 rounded-lg hover:brightness-105 disabled:opacity-50 transition">
                   {saving && <Loader2 size={14} className="animate-spin" />}
-                  {saving ? "Saving…" : "Add Customer"}
+                  {saving ? "Saving…" : "Save Changes"}
                 </button>
               </div>
             </form>

@@ -7,6 +7,7 @@ const CreateSchema = z.object({
   name: z.string().min(1),
   domain: z.string().optional().nullable(),
   industry: z.string().optional().nullable(),
+  hubspotId: z.string().optional().nullable(),
 });
 
 export async function GET() {

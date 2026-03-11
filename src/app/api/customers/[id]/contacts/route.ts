@@ -8,6 +8,7 @@ const Schema = z.object({
   lastName: z.string().min(1),
   email: z.string().email().optional().nullable(),
   jobTitle: z.string().optional().nullable(),
+  hubspotId: z.string().optional().nullable(),
 });
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

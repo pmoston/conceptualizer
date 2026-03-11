@@ -10,6 +10,7 @@ const Schema = z.object({
   currency: z.string().optional().nullable(),
   closeDate: z.string().optional().nullable(),
   ownerName: z.string().optional().nullable(),
+  hubspotId: z.string().optional().nullable(),
 });
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

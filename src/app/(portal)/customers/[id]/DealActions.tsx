@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, X, Loader2 } from "lucide-react";
+import { Plus, Trash2, X, Loader2, ExternalLink } from "lucide-react";
 
 interface Deal {
   id: string;
@@ -11,15 +11,24 @@ interface Deal {
   currency: string | null;
   closeDate: Date | string | null;
   ownerName: string | null;
+  hubspotId: string | null;
 }
 
-export default function DealActions({ customerId, deals }: { customerId: string; deals: Deal[] }) {
+export default function DealActions({
+  customerId,
+  deals,
+  portalId,
+}: {
+  customerId: string;
+  deals: Deal[];
+  portalId: string | null;
+}) {
   const router = useRouter();
   const [showAdd, setShowAdd] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", stage: "", amount: "", currency: "", closeDate: "", ownerName: "" });
+  const [form, setForm] = useState({ name: "", stage: "", amount: "", currency: "", closeDate: "", ownerName: "", hubspotId: "" });
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -36,12 +45,13 @@ export default function DealActions({ customerId, deals }: { customerId: string;
           currency: form.currency || null,
           closeDate: form.closeDate || null,
           ownerName: form.ownerName || null,
+          hubspotId: form.hubspotId || null,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setShowAdd(false);
-      setForm({ name: "", stage: "", amount: "", currency: "", closeDate: "", ownerName: "" });
+      setForm({ name: "", stage: "", amount: "", currency: "", closeDate: "", ownerName: "", hubspotId: "" });
       router.refresh();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed");
@@ -73,7 +83,16 @@ export default function DealActions({ customerId, deals }: { customerId: string;
         {deals.map(d => (
           <div key={d.id} className="py-3 flex items-center justify-between group">
             <div>
-              <p className="font-medium text-sm text-[#1c1e3b]">{d.name}</p>
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-sm text-[#1c1e3b]">{d.name}</p>
+                {d.hubspotId && portalId && (
+                  <a href={`https://app.hubspot.com/contacts/${portalId}/deal/${d.hubspotId}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="text-gray-300 hover:text-[#ff7a59] transition" title="View in HubSpot">
+                    <ExternalLink size={12} />
+                  </a>
+                )}
+              </div>
               <p className="text-xs text-gray-400 mt-0.5">{d.stage ?? "—"}{d.ownerName ? ` · ${d.ownerName}` : ""}</p>
             </div>
             <div className="flex items-center gap-3">
@@ -129,6 +148,12 @@ export default function DealActions({ customerId, deals }: { customerId: string;
               <input type="date" value={form.closeDate} onChange={e => setForm(f => ({ ...f, closeDate: e.target.value }))}
                 className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#b3cc26]" />
             </div>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">HubSpot Record ID</label>
+            <input value={form.hubspotId} onChange={e => setForm(f => ({ ...f, hubspotId: e.target.value }))}
+              placeholder="e.g. 12345678"
+              className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#b3cc26]" />
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
           <div className="flex justify-end gap-2">

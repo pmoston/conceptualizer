@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import ContactActions from "./ContactActions";
 import DealActions from "./DealActions";
 import DeleteCustomerButton from "./DeleteCustomerButton";
+import EditCustomerDialog from "./EditCustomerDialog";
 
 export default async function CustomerDetailPage({
   params,
@@ -23,6 +24,12 @@ export default async function CustomerDetailPage({
 
   if (!customer) notFound();
 
+  const portalId = process.env.HUBSPOT_PORTAL_ID ?? null;
+  const hubspotCompanyUrl =
+    customer.hubspotId && portalId
+      ? `https://app.hubspot.com/contacts/${portalId}/company/${customer.hubspotId}`
+      : null;
+
   return (
     <div className="max-w-4xl">
       <Link href="/customers" className="flex items-center gap-1 text-sm text-gray-400 hover:text-[#1c1e3b] mb-6">
@@ -31,18 +38,29 @@ export default async function CustomerDetailPage({
 
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-[#1c1e3b]">{customer.name}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-[#1c1e3b]">{customer.name}</h1>
+            {hubspotCompanyUrl && (
+              <a href={hubspotCompanyUrl} target="_blank" rel="noopener noreferrer"
+                className="text-gray-300 hover:text-[#ff7a59] transition" title="View in HubSpot">
+                <ExternalLink size={16} />
+              </a>
+            )}
+          </div>
           <div className="flex gap-4 mt-1 text-sm text-gray-500">
             {customer.domain && <span>{customer.domain}</span>}
             {customer.industry && <span>{customer.industry}</span>}
           </div>
         </div>
-        <DeleteCustomerButton customerId={customer.id} />
+        <div className="flex items-center gap-2">
+          <EditCustomerDialog customer={customer} />
+          <DeleteCustomerButton customerId={customer.id} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        <ContactActions customerId={customer.id} contacts={customer.contacts} />
-        <DealActions customerId={customer.id} deals={customer.deals} />
+        <ContactActions customerId={customer.id} contacts={customer.contacts} portalId={portalId} />
+        <DealActions customerId={customer.id} deals={customer.deals} portalId={portalId} />
 
         {/* Projects (read-only) */}
         <section className="bg-white rounded-xl border border-gray-100 p-5">

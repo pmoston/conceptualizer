@@ -7,6 +7,7 @@ const UpdateSchema = z.object({
   name: z.string().min(1).optional(),
   domain: z.string().optional().nullable(),
   industry: z.string().optional().nullable(),
+  hubspotId: z.string().optional().nullable(),
 });
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

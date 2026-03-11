@@ -36,11 +36,12 @@ export async function POST(req: NextRequest) {
       const name = col(row, "company name", "name");
       if (!name) continue;
       try {
-        await db.customer.upsert({
-          where: hubspotId ? { hubspotId } : { id: "__never__" },
-          update: { name, domain: col(row, "company domain name", "domain"), industry: col(row, "industry") },
-          create: { hubspotId, name, domain: col(row, "company domain name", "domain"), industry: col(row, "industry") },
-        });
+        const data = { name, domain: col(row, "company domain name", "domain"), industry: col(row, "industry") };
+        if (hubspotId) {
+          await db.customer.upsert({ where: { hubspotId }, update: data, create: { hubspotId, ...data } });
+        } else {
+          await db.customer.create({ data });
+        }
         imported++;
       } catch (e) {
         errors.push(`Row skipped: ${name}`);
