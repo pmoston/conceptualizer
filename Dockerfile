@@ -4,7 +4,7 @@ FROM base AS deps
 WORKDIR /app
 RUN npm install -g npm@latest --quiet
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps
+RUN npm ci --legacy-peer-deps && npm audit fix --legacy-peer-deps || true
 
 FROM base AS builder
 WORKDIR /app
