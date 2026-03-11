@@ -1,5 +1,5 @@
 import { streamText } from "ai";
-import { anthropic, defaultModel } from "@/lib/claude";
+import { AgentModels } from "@/lib/models";
 import { Language } from "@prisma/client";
 
 interface DraftAgentInput {
@@ -16,7 +16,7 @@ export async function runDraftAgent(input: DraftAgentInput) {
       : "Write the concept in English.";
 
   return streamText({
-    model: anthropic(defaultModel),
+    model: AgentModels["draft"],
     system: `You are an expert consultant at Dataciders GmbH, a data & AI consulting firm.
 You draft high-quality consulting concepts based on provided materials.
 ${languageInstruction}
