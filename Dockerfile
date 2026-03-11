@@ -2,11 +2,13 @@ FROM node:22-alpine AS base
 
 FROM base AS deps
 WORKDIR /app
+RUN npm install -g npm@latest --quiet
 COPY package*.json ./
 RUN npm ci --legacy-peer-deps
 
 FROM base AS builder
 WORKDIR /app
+RUN npm install -g npm@latest --quiet
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate
