@@ -1,3 +1,10 @@
+# Build artifacts
+tsconfig.tsbuildinfo
+.next/
+
+# Local settings
+.claude/settings.local.json
+
 # Dependencies
 node_modules/
 .pnp
@@ -48,3 +55,5 @@ venv/
 # Coverage
 coverage/
 .nyc_output/
+
+/src/generated/prisma

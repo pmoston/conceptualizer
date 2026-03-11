@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-dc-navy: #1c1e3b;
+  --color-dc-lime: #b3cc26;
+  --font-sans: "Barlow", Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: #f9fafb;
+  color: #1c1e3b;
+  font-family: var(--font-sans);
+}
