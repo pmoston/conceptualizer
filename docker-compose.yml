@@ -1,4 +1,21 @@
 services:
+  converter:
+    container_name: conceptualizer-converter
+    hostname: conceptualizer-converter
+    build: ./converter
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - conceptualizer-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   migrate:
     container_name: conceptualizer-migrate
     build:
@@ -25,19 +42,23 @@ services:
       AUTH_PASSWORD: ${AUTH_PASSWORD}
       AUTH_SECRET: ${AUTH_SECRET}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      HUBSPOT_API_KEY: ${HUBSPOT_API_KEY}
+      CONVERTER_URL: http://conceptualizer-converter:3001
     volumes:
-      - uploads:/app/uploads
+      - ./uploads:/app/uploads
     networks:
       - conceptualizer-net
     depends_on:
       migrate:
         condition: service_completed_successfully
+      converter:
+        condition: service_healthy
 
   db:
     container_name: conceptualizer-db
     hostname: ${DB_HOST}
     image: postgres:16-alpine
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -59,4 +80,3 @@ networks:
 
 volumes:
   pgdata:
-  uploads:

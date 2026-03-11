@@ -2,25 +2,37 @@ export default function HelpPage() {
   return (
     <div className="max-w-3xl">
       <h1 className="text-2xl font-bold text-[#1c1e3b] mb-1">Help</h1>
-      <p className="text-gray-500 text-sm mb-8">How to use the Conceptualizer portal.</p>
+      <p className="text-gray-500 text-sm mb-6">How to use the Conceptualizer portal.</p>
+
+      {/* Table of Contents */}
+      <nav className="bg-gray-50 border border-gray-100 rounded-xl px-5 py-4 mb-8">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Contents</p>
+        <ol className="space-y-1 text-sm">
+          <TocItem href="#overview" label="Overview" />
+          <TocItem href="#customers" label="Customers" />
+          <TocItem href="#projects" label="Projects" />
+          <TocItem href="#documents" label="Documents" />
+          <TocItem href="#agents" label="AI Agents" />
+        </ol>
+      </nav>
 
       <div className="space-y-8">
 
-        <Section title="Overview">
+        <Section id="overview" title="Overview">
           <p>
             Conceptualizer is a portal for creating and managing consulting concepts at Dataciders.
             The typical workflow is:
           </p>
           <ol className="list-decimal list-inside space-y-1 mt-2">
-            <li>Import a customer from HubSpot</li>
+            <li>Import or add a customer</li>
             <li>Create a project for that customer</li>
-            <li>Upload source materials (PDFs, DOCX, text files)</li>
+            <li>Upload source materials (PDFs, DOCX, XLSX, images, text files)</li>
             <li>Run AI agents to draft, review, and refine the concept</li>
             <li>Export or deliver the finished document</li>
           </ol>
         </Section>
 
-        <Section title="Customers">
+        <Section id="customers" title="Customers">
           <SubSection title="Adding customers manually">
             <p>
               Click <Strong>Add Customer</Strong> on the Customers page to create a company by entering
@@ -51,7 +63,7 @@ export default function HelpPage() {
           </SubSection>
         </Section>
 
-        <Section title="Projects">
+        <Section id="projects" title="Projects">
           <SubSection title="Creating a project">
             <p>
               Click <Strong>New Project</Strong> on the Projects page. You must select a customer.
@@ -82,13 +94,18 @@ export default function HelpPage() {
           </SubSection>
         </Section>
 
-        <Section title="Documents">
+        <Section id="documents" title="Documents">
           <SubSection title="Uploading">
             <p>
               On the project detail page, click <Strong>Upload</Strong> in the Documents section.
-              Supported formats: <code className="bg-gray-100 px-1 rounded text-xs">PDF</code>,{" "}
-              <code className="bg-gray-100 px-1 rounded text-xs">DOCX</code>,{" "}
-              <code className="bg-gray-100 px-1 rounded text-xs">TXT</code>.
+              Supported formats:{" "}
+              {["PDF", "DOCX", "XLSX", "TXT", "PNG", "JPG", "SVG"].map(fmt => (
+                <code key={fmt} className="bg-gray-100 px-1 rounded text-xs mx-0.5">{fmt}</code>
+              ))}.
+            </p>
+            <p className="mt-2">
+              A PNG preview is generated automatically on upload for all formats. For image files,
+              the text content is additionally extracted via OCR (Tesseract) and made available to AI agents.
             </p>
             <p className="mt-2">Assign a document type when uploading:</p>
             <ul className="mt-1 space-y-1 text-sm text-gray-600">
@@ -98,9 +115,16 @@ export default function HelpPage() {
               <li><Strong>Supporting</Strong> — appendices, data exports, supplementary files</li>
             </ul>
           </SubSection>
+          <SubSection title="Managing documents">
+            <p>
+              Hover over a document row to reveal action icons: <Strong>Preview</Strong> (eye icon),{" "}
+              <Strong>Open</Strong> (external link), <Strong>Edit</Strong> (rename or change type), and{" "}
+              <Strong>Delete</Strong>. Deletion removes both the database record and the stored file.
+            </p>
+          </SubSection>
         </Section>
 
-        <Section title="AI Agents">
+        <Section id="agents" title="AI Agents">
           <p className="text-gray-500 text-sm italic">
             Agent functionality is coming in the next release. The following agents will be available:
           </p>
@@ -121,9 +145,19 @@ export default function HelpPage() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function TocItem({ href, label }: { href: string; label: string }) {
   return (
-    <section>
+    <li>
+      <a href={href} className="text-[#1c1e3b] hover:text-[#b3cc26] transition-colors">
+        {label}
+      </a>
+    </li>
+  );
+}
+
+function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+  return (
+    <section id={id} className="scroll-mt-6">
       <h2 className="text-lg font-semibold text-[#1c1e3b] mb-3 pb-2 border-b border-gray-100">{title}</h2>
       <div className="space-y-4 text-sm text-gray-600 leading-relaxed">{children}</div>
     </section>
@@ -132,8 +166,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function SubSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div>
-      <h3 className="font-medium text-[#1c1e3b] mb-1">{title}</h3>
+    <div className="pl-3 border-l-2 border-[#b3cc26]">
+      <h3 className="text-sm font-semibold text-[#1c1e3b] mb-1.5">{title}</h3>
       {children}
     </div>
   );

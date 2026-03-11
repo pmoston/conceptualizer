@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, X, Loader2 } from "lucide-react";
 import { Language } from "@prisma/client";
+import SelectTooltip from "@/components/SelectTooltip";
+import { languageTooltip } from "@/lib/tooltipData";
 
 interface Deal { id: string; name: string; }
 
@@ -86,7 +88,10 @@ export default function EditProjectDialog({ project, deals }: Props) {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Language</label>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <label className="block text-xs font-medium text-gray-500">Language</label>
+                  <SelectTooltip title="Project language" items={languageTooltip} />
+                </div>
                 <select
                   value={form.language}
                   onChange={e => setForm(f => ({ ...f, language: e.target.value as Language }))}

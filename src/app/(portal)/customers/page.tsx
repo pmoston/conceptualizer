@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import AddCustomerDialog from "./AddCustomerDialog";
 import CsvImportDialog from "./CsvImportDialog";
+import HelpLink from "@/components/HelpLink";
 
 export default async function CustomersPage() {
   const customers = await db.customer.findMany({
@@ -15,7 +16,10 @@ export default async function CustomersPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#1c1e3b]">Customers</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-[#1c1e3b]">Customers</h1>
+            <HelpLink href="/help#customers" />
+          </div>
           <p className="text-gray-500 mt-1 text-sm">{customers.length} companies</p>
         </div>
         <div className="flex gap-2">

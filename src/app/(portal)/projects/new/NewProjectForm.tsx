@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Language } from "@prisma/client";
+import SelectTooltip from "@/components/SelectTooltip";
+import { languageTooltip } from "@/lib/tooltipData";
 
 interface Deal { id: string; name: string; }
 interface Customer { id: string; name: string; deals: Deal[]; }
@@ -78,7 +80,10 @@ export default function NewProjectForm({ customers }: { customers: Customer[] })
       )}
 
       <div>
-        <label className="block text-sm font-medium text-[#1c1e3b] mb-1">Language</label>
+        <div className="flex items-center gap-1.5 mb-1">
+          <label className="block text-sm font-medium text-[#1c1e3b]">Language</label>
+          <SelectTooltip title="Project language" items={languageTooltip} />
+        </div>
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value as Language)}

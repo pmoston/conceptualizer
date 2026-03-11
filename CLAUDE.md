@@ -104,12 +104,18 @@ Import customers (companies) and contacts from HubSpot via the HubSpot API. Sync
 
 ## Environment Variables
 
+**When adding or changing any env var, always update all three files:**
+- `.env.example` — documented template (committed)
+- `.env` — real values for Podman containers, uses internal hostnames (e.g. `conceptualizer-converter:3001`)
+- `.env.local` — local dev overrides, uses `localhost` equivalents (e.g. `localhost:3001`); gitignored
+
 ```env
 DATABASE_URL=postgresql://...
 AUTH_PASSWORD=...          # Single password for portal access
 AUTH_SECRET=...            # JWT/session secret
 ANTHROPIC_API_KEY=...
-HUBSPOT_API_KEY=...
+HUBSPOT_PORTAL_ID=...      # For HubSpot deep links (optional)
+CONVERTER_URL=...          # http://conceptualizer-converter:3001 in containers, http://localhost:3001 locally
 ```
 
 ## Git

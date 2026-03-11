@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ProjectStatus } from "@prisma/client";
 import { Trash2 } from "lucide-react";
+import SelectTooltip from "@/components/SelectTooltip";
+import { projectStatusTooltip } from "@/lib/tooltipData";
 
 const statuses = Object.values(ProjectStatus);
 
@@ -39,6 +41,9 @@ export default function ProjectActions({ project }: { project: { id: string; sta
           <option key={s} value={s}>{s.replace("_", " ")}</option>
         ))}
       </select>
+
+      <SelectTooltip title="Project status" items={projectStatusTooltip} align="right" />
+
       <button
         onClick={handleDelete}
         disabled={deleting}

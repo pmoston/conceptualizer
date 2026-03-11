@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { DocumentType } from "@prisma/client";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { generatePreview } from "@/lib/converter";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -23,9 +24,20 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
 
-  const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"];
+  const allowedTypes = [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "text/plain",
+    "image/png",
+    "image/jpeg",
+    "image/svg+xml",
+  ];
   if (!allowedTypes.includes(file.type)) {
-    return NextResponse.json({ error: "Only PDF, DOCX and TXT files are allowed" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Only PDF, DOCX, XLSX, TXT, PNG, JPG and SVG files are allowed" },
+      { status: 400 }
+    );
   }
 
   const uploadDir = path.join(process.cwd(), "uploads", projectId);
@@ -36,14 +48,22 @@ export async function POST(req: NextRequest, { params }: Params) {
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(filePath, buffer);
 
+  const relFilePath = path.join("uploads", projectId, fileName);
+
+  // Generate preview asynchronously (non-blocking; failure is non-fatal)
+  const preview = await generatePreview(relFilePath, file.type);
+
   const document = await db.document.create({
     data: {
       name: file.name,
       type,
-      filePath: path.join("uploads", projectId, fileName),
+      filePath: relFilePath,
       mimeType: file.type,
       sizeBytes: file.size,
       projectId,
+      previewPath: preview?.previewPath ?? null,
+      previewError: preview?.error ?? null,
+      ocrText: preview?.ocrText ?? null,
     },
   });
 

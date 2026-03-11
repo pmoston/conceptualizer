@@ -7,9 +7,9 @@ export default async function PortalLayout({ children }: { children: React.React
   if (!session.authenticated) redirect("/login");
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-50 flex overflow-hidden">
       <Nav />
-      <main className="flex-1 p-8">{children}</main>
+      <main className="flex-1 overflow-y-auto p-8">{children}</main>
     </div>
   );
 }

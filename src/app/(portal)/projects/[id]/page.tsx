@@ -5,6 +5,8 @@ import { ArrowLeft } from "lucide-react";
 import { ProjectStatus, Language } from "@prisma/client";
 import ProjectActions from "./ProjectActions";
 import EditProjectDialog from "./EditProjectDialog";
+import DocumentList from "./DocumentList";
+import HelpLink from "@/components/HelpLink";
 
 const statusColors: Record<ProjectStatus, string> = {
   DRAFT: "bg-gray-100 text-gray-500",
@@ -69,7 +71,10 @@ export default async function ProjectDetailPage({
         {/* Documents */}
         <section className="bg-white rounded-xl border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-[#1c1e3b]">Documents ({project.documents.length})</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-semibold text-[#1c1e3b]">Documents ({project.documents.length})</h2>
+              <HelpLink href="/help#documents" />
+            </div>
             <Link
               href={`/projects/${id}/documents/upload`}
               className="text-xs bg-[#b3cc26] text-[#1c1e3b] font-medium px-3 py-1.5 rounded-lg hover:brightness-105 transition"
@@ -77,53 +82,62 @@ export default async function ProjectDetailPage({
               Upload
             </Link>
           </div>
-          {project.documents.length === 0 ? (
-            <p className="text-sm text-gray-400">No documents yet. Upload source materials to get started.</p>
-          ) : (
-            <div className="divide-y divide-gray-50">
-              {project.documents.map((doc) => (
-                <div key={doc.id} className="py-3 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-[#1c1e3b]">{doc.name}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{doc.type} · {(doc.sizeBytes / 1024).toFixed(0)} KB</p>
-                  </div>
-                  <span className="text-xs text-gray-400">{new Date(doc.createdAt).toLocaleDateString()}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          <DocumentList documents={project.documents} projectId={id} />
         </section>
 
-        {/* Agent runs */}
+        {/* Agent launch buttons */}
         <section className="bg-white rounded-xl border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-[#1c1e3b]">Agent Runs ({project.agentRuns.length})</h2>
-            <Link
-              href={`/projects/${id}/agents`}
-              className="text-xs bg-[#1c1e3b] text-white font-medium px-3 py-1.5 rounded-lg hover:bg-[#2a2d52] transition"
-            >
-              Run Agent
-            </Link>
+          <h2 className="font-semibold text-[#1c1e3b] mb-4">Agents</h2>
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { name: "read-materials",          label: "Read Materials" },
+              { name: "draft",                   label: "Draft Concept" },
+              { name: "fact-check",              label: "Fact-Check" },
+              { name: "humanize",                label: "Humanize" },
+              { name: "corporate-design-review", label: "Corp. Design Review" },
+              { name: "translate",               label: "Translate" },
+              { name: "executive-summary",       label: "Exec. Summary" },
+              { name: "qa-checklist",            label: "QA Checklist" },
+            ].map(agent => (
+              <Link
+                key={agent.name}
+                href={`/projects/${id}/agents?agent=${agent.name}`}
+                className="flex items-center justify-center text-center text-xs font-medium bg-[#1c1e3b] text-white px-3 py-2 rounded-lg hover:bg-[#2a2d52] transition leading-snug"
+              >
+                {agent.label}
+              </Link>
+            ))}
           </div>
+        </section>
+
+        {/* Agent run history */}
+        <section className="bg-white rounded-xl border border-gray-100 p-5">
+          <h2 className="font-semibold text-[#1c1e3b] mb-4">
+            Agent Run History ({project.agentRuns.length})
+          </h2>
           {project.agentRuns.length === 0 ? (
             <p className="text-sm text-gray-400">No agent runs yet.</p>
           ) : (
             <div className="divide-y divide-gray-50">
               {project.agentRuns.map((run) => (
-                <div key={run.id} className="py-3 flex items-center justify-between">
+                <Link
+                  key={run.id}
+                  href={`/projects/${id}/agents/runs/${run.id}`}
+                  className="py-3 flex items-center justify-between group hover:bg-gray-50 -mx-2 px-2 rounded-lg transition"
+                >
                   <div>
-                    <p className="text-sm font-medium text-[#1c1e3b]">{run.agentName}</p>
+                    <p className="text-sm font-medium text-[#1c1e3b] group-hover:underline">{run.agentName}</p>
                     <p className="text-xs text-gray-400 mt-0.5">{new Date(run.startedAt).toLocaleString()}</p>
                   </div>
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                     run.status === "COMPLETED" ? "bg-green-50 text-green-600" :
-                    run.status === "FAILED" ? "bg-red-50 text-red-500" :
-                    run.status === "RUNNING" ? "bg-blue-50 text-blue-600" :
+                    run.status === "FAILED"    ? "bg-red-50 text-red-500" :
+                    run.status === "RUNNING"   ? "bg-blue-50 text-blue-600" :
                     "bg-gray-100 text-gray-500"
                   }`}>
                     {run.status}
                   </span>
-                </div>
+                </Link>
               ))}
             </div>
           )}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { Plus } from "lucide-react";
 import { ProjectStatus, Language } from "@prisma/client";
+import HelpLink from "@/components/HelpLink";
 
 const statusColors: Record<ProjectStatus, string> = {
   DRAFT: "bg-gray-100 text-gray-500",
@@ -29,7 +30,10 @@ export default async function ProjectsPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#1c1e3b]">Projects</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-[#1c1e3b]">Projects</h1>
+            <HelpLink href="/help#projects" />
+          </div>
           <p className="text-gray-500 mt-1 text-sm">{projects.length} projects</p>
         </div>
         <Link
