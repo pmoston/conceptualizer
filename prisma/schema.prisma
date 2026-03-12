@@ -81,17 +81,39 @@ model Document {
 }
 
 model AgentRun {
-  id          String      @id @default(cuid())
+  id          String             @id @default(cuid())
   agentName   String
-  status      AgentStatus @default(PENDING)
+  status      AgentStatus        @default(PENDING)
   input       Json
   output      String?
   error       String?
   steps       AgentStep[]
-  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  messages    AgentMessage[]
+  auditLogs   WorkflowAuditLog[]
+  project     Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId   String
-  startedAt   DateTime    @default(now())
+  startedAt   DateTime           @default(now())
   completedAt DateTime?
+}
+
+model WorkflowAuditLog {
+  id        String   @id @default(cuid())
+  runId     String
+  run       AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  iteration Int      @default(0)
+  phase     String
+  verdict   String?
+  details   String?
+  createdAt DateTime @default(now())
+}
+
+model AgentMessage {
+  id        String      @id @default(cuid())
+  runId     String
+  run       AgentRun    @relation(fields: [runId], references: [id], onDelete: Cascade)
+  role      MessageRole
+  content   String
+  createdAt DateTime    @default(now())
 }
 
 model AgentStep {
@@ -127,8 +149,14 @@ enum DocumentType {
 enum AgentStatus {
   PENDING
   RUNNING
+  AWAITING_INPUT
   COMPLETED
   FAILED
+}
+
+enum MessageRole {
+  USER
+  AGENT
 }
 
 enum StepType {

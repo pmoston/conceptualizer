@@ -14,6 +14,7 @@ export type StreamEvent =
   | { t: "step"; kind: StepKind; label: string; content?: string }
   | { t: "delta"; text: string }
   | { t: "done"; runId: string }
+  | { t: "await_input"; runId: string; question: string; questions: string[]; round: number }
   | { t: "err"; message: string };
 
 export function encode(event: StreamEvent): Uint8Array {
