@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { ArrowLeft } from "lucide-react";
-import { ProjectStatus, Language } from "@prisma/client";
+import { ProjectStatus, Language, Platform } from "@prisma/client";
 import ProjectActions from "./ProjectActions";
 import EditProjectDialog from "./EditProjectDialog";
 import DocumentList from "./DocumentList";
@@ -16,6 +16,22 @@ const statusColors: Record<ProjectStatus, string> = {
 };
 
 const languageLabels: Record<Language, string> = { EN: "English", DE: "German" };
+
+const platformLabels: Record<Platform, string> = {
+  MICROSOFT_FABRIC: "Microsoft Fabric",
+  MICROSOFT_AZURE:  "Microsoft Azure",
+  DATABRICKS:       "Databricks",
+  DENODO:           "Denodo",
+  OTHER:            "Other",
+};
+
+const platformColors: Record<Platform, string> = {
+  MICROSOFT_FABRIC: "bg-blue-50 text-blue-700",
+  MICROSOFT_AZURE:  "bg-sky-50 text-sky-700",
+  DATABRICKS:       "bg-orange-50 text-orange-700",
+  DENODO:           "bg-purple-50 text-purple-700",
+  OTHER:            "bg-gray-100 text-gray-500",
+};
 
 export default async function ProjectDetailPage({
   params,
@@ -55,12 +71,17 @@ export default async function ProjectDetailPage({
             <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
               {languageLabels[project.language]}
             </span>
+            {project.platform && (
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${platformColors[project.platform]}`}>
+                {platformLabels[project.platform]}
+              </span>
+            )}
           </div>
           {project.description && <p className="text-sm text-gray-500 mt-3 max-w-xl whitespace-pre-wrap">{project.description}</p>}
         </div>
         <div className="flex items-center gap-2">
           <EditProjectDialog
-            project={{ id: project.id, title: project.title, language: project.language, description: project.description, dealId: project.dealId }}
+            project={{ id: project.id, title: project.title, language: project.language, platform: project.platform, description: project.description, dealId: project.dealId }}
             deals={project.customer.deals ?? []}
           />
           <ProjectActions project={{ id: project.id, status: project.status }} />

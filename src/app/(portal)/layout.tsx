@@ -8,7 +8,7 @@ export default async function PortalLayout({ children }: { children: React.React
 
   return (
     <div className="h-screen bg-gray-50 flex overflow-hidden">
-      <Nav />
+      <Nav isAdmin={session.role === "ADMIN"} />
       <main className="flex-1 overflow-y-auto p-8">{children}</main>
     </div>
   );

@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
-import { Language } from "@prisma/client";
+import { Language, Platform } from "@prisma/client";
 
 const createSchema = z.object({
   title: z.string().min(1),
   language: z.nativeEnum(Language),
+  platform: z.nativeEnum(Platform).optional().nullable(),
   customerId: z.string().min(1),
   dealId: z.string().optional().nullable(),
   description: z.string().optional().nullable(),

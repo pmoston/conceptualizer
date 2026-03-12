@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Language } from "@prisma/client";
+import { Language, Platform } from "@prisma/client";
 import SelectTooltip from "@/components/SelectTooltip";
-import { languageTooltip } from "@/lib/tooltipData";
+import { languageTooltip, platformTooltip } from "@/lib/tooltipData";
 
 interface Deal { id: string; name: string; }
 interface Customer { id: string; name: string; deals: Deal[]; }
@@ -14,6 +14,7 @@ export default function NewProjectForm({ customers }: { customers: Customer[] })
   const [dealId, setDealId] = useState("");
   const [title, setTitle] = useState("");
   const [language, setLanguage] = useState<Language>(Language.DE);
+  const [platform, setPlatform] = useState<Platform | "">("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -28,7 +29,7 @@ export default function NewProjectForm({ customers }: { customers: Customer[] })
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, language, customerId, dealId: dealId || null, description: description || null }),
+        body: JSON.stringify({ title, language, platform: platform || null, customerId, dealId: dealId || null, description: description || null }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(JSON.stringify(data.error));
@@ -91,6 +92,25 @@ export default function NewProjectForm({ customers }: { customers: Customer[] })
         >
           <option value={Language.DE}>German</option>
           <option value={Language.EN}>English</option>
+        </select>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-1.5 mb-1">
+          <label className="block text-sm font-medium text-[#1c1e3b]">Platform <span className="text-gray-400 font-normal">(optional)</span></label>
+          <SelectTooltip title="Target platform" items={platformTooltip} />
+        </div>
+        <select
+          value={platform}
+          onChange={(e) => setPlatform(e.target.value as Platform | "")}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#b3cc26]"
+        >
+          <option value="">Not specified</option>
+          <option value={Platform.MICROSOFT_FABRIC}>Microsoft Fabric</option>
+          <option value={Platform.MICROSOFT_AZURE}>Microsoft Azure</option>
+          <option value={Platform.DATABRICKS}>Databricks</option>
+          <option value={Platform.DENODO}>Denodo</option>
+          <option value={Platform.OTHER}>Other</option>
         </select>
       </div>
 

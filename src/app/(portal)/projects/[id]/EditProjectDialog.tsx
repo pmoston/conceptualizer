@@ -2,9 +2,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, X, Loader2 } from "lucide-react";
-import { Language } from "@prisma/client";
+import { Language, Platform } from "@prisma/client";
 import SelectTooltip from "@/components/SelectTooltip";
-import { languageTooltip } from "@/lib/tooltipData";
+import { languageTooltip, platformTooltip } from "@/lib/tooltipData";
 
 interface Deal { id: string; name: string; }
 
@@ -13,6 +13,7 @@ interface Props {
     id: string;
     title: string;
     language: Language;
+    platform: Platform | null;
     description: string | null;
     dealId: string | null;
   };
@@ -27,6 +28,7 @@ export default function EditProjectDialog({ project, deals }: Props) {
   const [form, setForm] = useState({
     title: project.title,
     language: project.language,
+    platform: project.platform ?? ("" as Platform | ""),
     description: project.description ?? "",
     dealId: project.dealId ?? "",
   });
@@ -42,6 +44,7 @@ export default function EditProjectDialog({ project, deals }: Props) {
         body: JSON.stringify({
           title: form.title,
           language: form.language,
+          platform: form.platform || null,
           description: form.description || null,
           dealId: form.dealId || null,
         }),
@@ -99,6 +102,25 @@ export default function EditProjectDialog({ project, deals }: Props) {
                 >
                   <option value={Language.DE}>German</option>
                   <option value={Language.EN}>English</option>
+                </select>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <label className="block text-xs font-medium text-gray-500">Platform <span className="text-gray-400 font-normal">(optional)</span></label>
+                  <SelectTooltip title="Target platform" items={platformTooltip} />
+                </div>
+                <select
+                  value={form.platform}
+                  onChange={e => setForm(f => ({ ...f, platform: e.target.value as Platform | "" }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#b3cc26]"
+                >
+                  <option value="">Not specified</option>
+                  <option value={Platform.MICROSOFT_FABRIC}>Microsoft Fabric</option>
+                  <option value={Platform.MICROSOFT_AZURE}>Microsoft Azure</option>
+                  <option value={Platform.DATABRICKS}>Databricks</option>
+                  <option value={Platform.DENODO}>Denodo</option>
+                  <option value={Platform.OTHER}>Other</option>
                 </select>
               </div>
 

@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
-import { Language, ProjectStatus } from "@prisma/client";
+import { Language, Platform, ProjectStatus } from "@prisma/client";
 
 const updateSchema = z.object({
   title: z.string().min(1).optional(),
   language: z.nativeEnum(Language).optional(),
   status: z.nativeEnum(ProjectStatus).optional(),
+  platform: z.nativeEnum(Platform).optional().nullable(),
   description: z.string().optional().nullable(),
   dealId: z.string().optional().nullable(),
 });

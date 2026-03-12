@@ -15,6 +15,7 @@ export default function HelpPage() {
           <TocItem href="#documents" label="Documents" />
           <TocItem href="#agents" label="AI Agents" />
           <TocItem href="#agents" label="↳ Workflow, dialogue, audit log" />
+          <TocItem href="#users" label="User Management" />
         </ol>
       </nav>
 
@@ -92,6 +93,18 @@ export default function HelpPage() {
               Projects have a <Strong>language</Strong> setting (German or English). All concept
               documents and agent outputs will be produced in that language.
             </p>
+            <p className="mt-2">
+              Set the <Strong>platform</Strong> to indicate the target technology. This drives the platform
+              breakdown on the dashboard and gives agents additional context. Hover the info icon next to
+              the Platform field to see the rationale for each option:
+            </p>
+            <ul className="mt-1 space-y-1">
+              <StatusBadge label="Microsoft Fabric" color="bg-blue-50 text-blue-700" description="Unified SaaS analytics — OneLake, Data Factory, Power BI, Real-Time Intelligence" />
+              <StatusBadge label="Microsoft Azure" color="bg-sky-50 text-sky-700" description="Broader Azure data/AI stack — ADF, ADLS, Azure SQL, Azure OpenAI, Azure ML" />
+              <StatusBadge label="Databricks" color="bg-orange-50 text-orange-700" description="Independent lakehouse — Spark, Delta Lake, MLflow, Unity Catalog" />
+              <StatusBadge label="Denodo" color="bg-purple-50 text-purple-700" description="Data virtualisation / logical data warehouse" />
+              <StatusBadge label="Other" color="bg-gray-100 text-gray-500" description="Any other platform — describe it in the project description" />
+            </ul>
           </SubSection>
           <SubSection title="Project status">
             <p>
@@ -214,6 +227,34 @@ export default function HelpPage() {
               <AgentRow name="executive-summary" description="Produces a standalone 300–400 word executive summary using the SCR (Situation–Complication–Resolution) framework." />
               <AgentRow name="qa-checklist" description="Runs a final pre-delivery checklist covering completeness, consistency, SCR structure, and Minto Pyramid alignment." />
             </ul>
+          </SubSection>
+        </Section>
+
+        <Section id="users" title="User Management">
+          <p>
+            User management is available to <Strong>Admins</Strong> under <Strong>Settings → Users</Strong> in the navigation.
+          </p>
+          <SubSection title="Roles">
+            <ul className="mt-1 space-y-1">
+              <StatusBadge label="Admin"      color="bg-red-50 text-red-600"    description="Full access including user management — create, edit, and delete users" />
+              <StatusBadge label="Consultant" color="bg-blue-50 text-blue-600"  description="Create/edit projects, upload documents, run agents" />
+              <StatusBadge label="Viewer"     color="bg-gray-100 text-gray-500" description="Read-only access — can view projects and runs but cannot create, edit, or trigger agents" />
+            </ul>
+          </SubSection>
+          <SubSection title="First login (bootstrap)">
+            <p>
+              On a fresh installation with no users in the database, the first login automatically
+              creates an Admin account using the <code className="bg-gray-100 px-1 rounded text-xs">AUTH_EMAIL</code> and{" "}
+              <code className="bg-gray-100 px-1 rounded text-xs">AUTH_PASSWORD</code> environment variables.
+              After that account exists, additional users are managed through the Settings page.
+            </p>
+          </SubSection>
+          <SubSection title="Managing users">
+            <p>
+              From Settings → Users you can add new users (name, email, password, role), change an existing
+              user&apos;s role via the dropdown, toggle a user active/inactive, or permanently delete them.
+              You cannot delete your own account.
+            </p>
           </SubSection>
         </Section>
 

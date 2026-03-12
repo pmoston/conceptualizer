@@ -54,6 +54,7 @@ model Project {
   title       String
   language    Language      @default(EN)
   status      ProjectStatus @default(DRAFT)
+  platform    Platform?
   description String?
   customer    Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId  String
@@ -167,4 +168,31 @@ enum StepType {
   TOOL_RESULT
   WARNING
   ERROR
+}
+
+// ─── Platform & User ──────────────────────────────────────────────────────────
+
+enum Platform {
+  MICROSOFT_FABRIC  // Unified SaaS analytics: OneLake, Data Factory, Power BI, Real-Time Intelligence
+  MICROSOFT_AZURE   // Broader Azure data/AI stack: ADF, ADLS, Azure SQL, Azure OpenAI, Azure ML
+  DATABRICKS        // Independent lakehouse: Spark, Delta Lake, MLflow, Unity Catalog
+  DENODO            // Data virtualisation / logical data warehouse
+  OTHER
+}
+
+enum UserRole {
+  VIEWER      // Read-only access
+  CONSULTANT  // Create/edit projects, run agents
+  ADMIN       // Full access including user management
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         UserRole @default(CONSULTANT)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }

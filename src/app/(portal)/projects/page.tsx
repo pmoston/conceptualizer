@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { Plus } from "lucide-react";
-import { ProjectStatus, Language } from "@prisma/client";
+import { ProjectStatus, Language, Platform } from "@prisma/client";
 import HelpLink from "@/components/HelpLink";
 
 const statusColors: Record<ProjectStatus, string> = {
@@ -14,6 +14,22 @@ const statusColors: Record<ProjectStatus, string> = {
 const languageLabels: Record<Language, string> = {
   EN: "English",
   DE: "German",
+};
+
+const platformLabels: Record<Platform, string> = {
+  MICROSOFT_FABRIC: "Fabric",
+  MICROSOFT_AZURE:  "Azure",
+  DATABRICKS:       "Databricks",
+  DENODO:           "Denodo",
+  OTHER:            "Other",
+};
+
+const platformColors: Record<Platform, string> = {
+  MICROSOFT_FABRIC: "bg-blue-50 text-blue-700",
+  MICROSOFT_AZURE:  "bg-sky-50 text-sky-700",
+  DATABRICKS:       "bg-orange-50 text-orange-700",
+  DENODO:           "bg-purple-50 text-purple-700",
+  OTHER:            "bg-gray-100 text-gray-500",
 };
 
 export default async function ProjectsPage() {
@@ -56,6 +72,7 @@ export default async function ProjectsPage() {
                 <th className="px-4 py-3 text-left">Title</th>
                 <th className="px-4 py-3 text-left">Customer</th>
                 <th className="px-4 py-3 text-left">Deal</th>
+                <th className="px-4 py-3 text-center">Platform</th>
                 <th className="px-4 py-3 text-center">Language</th>
                 <th className="px-4 py-3 text-center">Status</th>
                 <th className="px-4 py-3 text-center">Docs</th>
@@ -75,6 +92,13 @@ export default async function ProjectsPage() {
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-gray-500">{p.deal?.name ?? "—"}</td>
+                  <td className="px-4 py-3 text-center">
+                    {p.platform ? (
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${platformColors[p.platform]}`}>
+                        {platformLabels[p.platform]}
+                      </span>
+                    ) : <span className="text-gray-300">—</span>}
+                  </td>
                   <td className="px-4 py-3 text-center">
                     <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
                       {languageLabels[p.language]}

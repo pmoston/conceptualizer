@@ -13,14 +13,23 @@ export default async function LoginPage({
           <h1 className="text-xl font-semibold text-[#1c1e3b]">Conceptualizer</h1>
         </div>
         {error && (
-          <p className="mb-4 text-sm text-red-600 text-center">Incorrect password. Please try again.</p>
+          <p className="mb-4 text-sm text-red-600 text-center">Incorrect email or password.</p>
         )}
         <form action="/api/auth/login" method="POST" className="space-y-4">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            required
+            autoComplete="email"
+            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#b3cc26]"
+          />
           <input
             type="password"
             name="password"
             placeholder="Password"
             required
+            autoComplete="current-password"
             className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#b3cc26]"
           />
           <button
