@@ -9,6 +9,7 @@ export default function HelpPage() {
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Contents</p>
         <ol className="space-y-1 text-sm">
           <TocItem href="#overview" label="Overview" />
+          <TocItem href="#dashboard" label="Dashboard" />
           <TocItem href="#customers" label="Customers" />
           <TocItem href="#projects" label="Projects" />
           <TocItem href="#documents" label="Documents" />
@@ -31,6 +32,22 @@ export default function HelpPage() {
             <li>Run AI agents to draft, review, and refine the concept</li>
             <li>Export or deliver the finished document</li>
           </ol>
+        </Section>
+
+        <Section id="dashboard" title="Dashboard">
+          <p>
+            The Dashboard is the home screen, showing a real-time snapshot of your workspace.
+          </p>
+          <ul className="mt-2 space-y-1">
+            <li><Strong>Customers</Strong> — total number of customers; click to go to the customer list.</li>
+            <li><Strong>Projects</Strong> — total projects with a status breakdown (Draft / In Progress / Review / Done).</li>
+            <li><Strong>Documents</Strong> — total uploaded documents across all projects.</li>
+            <li><Strong>Agent Runs</Strong> — total runs with a count of completed, active, and failed.</li>
+          </ul>
+          <p className="mt-2">
+            Below the cards, the <Strong>Recent Projects</Strong> and <Strong>Recent Agent Runs</Strong> panels
+            show the 5 most recent entries. All items link directly to their detail pages.
+          </p>
         </Section>
 
         <Section id="customers" title="Customers">
