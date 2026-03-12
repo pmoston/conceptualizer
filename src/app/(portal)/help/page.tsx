@@ -13,6 +13,7 @@ export default function HelpPage() {
           <TocItem href="#projects" label="Projects" />
           <TocItem href="#documents" label="Documents" />
           <TocItem href="#agents" label="AI Agents" />
+          <TocItem href="#agents" label="↳ Workflow, dialogue, audit log" />
         </ol>
       </nav>
 
@@ -125,19 +126,78 @@ export default function HelpPage() {
         </Section>
 
         <Section id="agents" title="AI Agents">
-          <p className="text-gray-500 text-sm italic">
-            Agent functionality is coming in the next release. The following agents will be available:
+          <p>
+            The Agents tab on a project page lets you run AI agents on your uploaded documents.
+            Agents are invoked one at a time and stream their output in real time. Each run is saved
+            and can be reviewed in full detail via the run history.
           </p>
-          <ul className="mt-3 space-y-2 text-sm text-gray-600">
-            <AgentRow name="read-materials" description="Summarises uploaded source documents into structured key facts, client needs, and open questions." />
-            <AgentRow name="draft" description="Writes the initial concept document based on the materials summary." />
-            <AgentRow name="fact-check" description="Cross-references claims in the draft against source materials and flags unsupported statements." />
-            <AgentRow name="humanize" description="Rewrites AI-sounding passages to match Dataciders' confident, direct tone." />
-            <AgentRow name="corporate-design-review" description="Checks wording and structure against Dataciders brand guidelines." />
-            <AgentRow name="translate" description="Translates a completed concept between German and English professionally." />
-            <AgentRow name="executive-summary" description="Generates a standalone 1-page executive summary from the full concept." />
-            <AgentRow name="qa-checklist" description="Runs a final pre-delivery checklist for completeness, consistency, and formatting." />
-          </ul>
+
+          <SubSection title="Workflow">
+            <p>
+              The agent page shows the recommended pipeline in order. Each agent feeds into the next:
+            </p>
+            <ol className="list-decimal list-inside space-y-1 mt-2">
+              <li><Strong>Read Materials</Strong> — analyses all uploaded documents and produces a structured brief</li>
+              <li><Strong>Draft</Strong> — writes the concept document; reruns with fact-check feedback until the draft passes (up to 3 iterations)</li>
+              <li><Strong>Fact-Check</Strong> — cross-references every claim against source materials</li>
+              <li><Strong>Humanize</Strong> — rewrites AI-sounding passages to match Dataciders' tone</li>
+              <li><Strong>Corporate Design Review</Strong> — checks structure and wording against brand guidelines; triggers a full revision cycle (Draft → Fact-Check → Humanize → CDR) if critical issues are found, up to 3 times</li>
+              <li><Strong>Executive Summary</Strong> — generates a 1-page summary from the approved concept</li>
+            </ol>
+            <p className="mt-2">
+              Standalone agents (<Strong>Translate</Strong>, <Strong>QA Checklist</Strong>) can be run independently at any point.
+            </p>
+          </SubSection>
+
+          <SubSection title="Document sources (Read Materials)">
+            <p>
+              The Read Materials agent uses a four-tier source hierarchy when analysing your project documents:
+            </p>
+            <ol className="list-decimal list-inside space-y-1 mt-2">
+              <li><Strong>Primary</Strong> — the actual uploaded file (PDF or image), sent directly to the model</li>
+              <li><Strong>Secondary</Strong> — OCR-extracted text from the file</li>
+              <li><Strong>Tertiary</Strong> — online lookups from official sources (Microsoft Learn) when available</li>
+              <li><Strong>Fourth</Strong> — model training knowledge, used only as a last resort</li>
+            </ol>
+            <p className="mt-2">
+              All document types are reviewed: Source Material, Supporting, Draft, and Final documents.
+            </p>
+          </SubSection>
+
+          <SubSection title="Clarification dialogue">
+            <p>
+              If an agent (Read Materials or Draft) finds that the source materials are insufficient
+              to proceed, it will pause and list its open questions. You can then type your answers
+              directly in the agent panel and submit them. The agent evaluates each answer for
+              completeness — if any answer is vague or missing, it will ask again. Only once all
+              questions are resolved does the run continue to completion.
+            </p>
+            <p className="mt-2">
+              The full conversation history (agent questions and your replies) is saved and visible
+              in the run detail view.
+            </p>
+          </SubSection>
+
+          <SubSection title="Audit log">
+            <p>
+              For multi-step workflows (Draft loop, CDR loop), a workflow audit log is recorded at
+              each decision point: iteration number, phase, verdict (PASS / FAIL / WARN), and details.
+              The full log is visible on the agent run detail page under <Strong>Workflow Audit Log</Strong>.
+            </p>
+          </SubSection>
+
+          <SubSection title="All agents">
+            <ul className="mt-1 space-y-2 text-sm text-gray-600">
+              <AgentRow name="read-materials" description="Reads all uploaded documents using a four-tier source hierarchy and produces a MECE brief with KT Situation Appraisal. Pauses to ask clarifying questions if the materials are incomplete." />
+              <AgentRow name="draft" description="Writes the concept document. Automatically loops with fact-check feedback until the draft passes or the iteration limit is reached. Supports revision mode when an existing draft is present." />
+              <AgentRow name="fact-check" description="Cross-references every claim in the draft against source materials and flags unsupported statements with a PASS/FAIL verdict." />
+              <AgentRow name="humanize" description="Rewrites AI-sounding passages — removes hollow openers, transition filler, and passive voice — to match Dataciders' confident, direct style." />
+              <AgentRow name="corporate-design-review" description="Audits structure, wording, and brand compliance. Classifies findings by severity (Critical / High / Medium). Triggers a full revision cycle on failure, up to 3 iterations." />
+              <AgentRow name="translate" description="Translates the finished concept between German and English." />
+              <AgentRow name="executive-summary" description="Produces a standalone 300–400 word executive summary using the SCR (Situation–Complication–Resolution) framework." />
+              <AgentRow name="qa-checklist" description="Runs a final pre-delivery checklist covering completeness, consistency, SCR structure, and Minto Pyramid alignment." />
+            </ul>
+          </SubSection>
         </Section>
 
       </div>

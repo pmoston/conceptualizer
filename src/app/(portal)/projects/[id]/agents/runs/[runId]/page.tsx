@@ -15,10 +15,11 @@ const stepIcon: Record<StepType, React.ReactNode> = {
 };
 
 const statusColors: Record<string, string> = {
-  COMPLETED: "bg-green-50 text-green-600",
-  FAILED:    "bg-red-50 text-red-500",
-  RUNNING:   "bg-blue-50 text-blue-600",
-  PENDING:   "bg-gray-100 text-gray-500",
+  COMPLETED:      "bg-green-50 text-green-600",
+  FAILED:         "bg-red-50 text-red-500",
+  RUNNING:        "bg-blue-50 text-blue-600",
+  AWAITING_INPUT: "bg-yellow-50 text-yellow-700",
+  PENDING:        "bg-gray-100 text-gray-500",
 };
 
 const agentLabels: Record<string, string> = {
@@ -38,8 +39,12 @@ export default async function RunDetailPage({ params }: Params) {
   const { id: projectId, runId } = await params;
 
   const run = await db.agentRun.findUnique({
-    where: { id: runId },
-    include: { steps: { orderBy: { index: "asc" } } },
+    where:   { id: runId },
+    include: {
+      steps:     { orderBy: { index: "asc" } },
+      messages:  { orderBy: { createdAt: "asc" } },
+      auditLogs: { orderBy: { createdAt: "asc" } },
+    },
   });
 
   if (!run || run.projectId !== projectId) notFound();
@@ -111,10 +116,82 @@ export default async function RunDetailPage({ params }: Params) {
         </section>
       )}
 
+      {/* Workflow audit log */}
+      {run.auditLogs.length > 0 && (
+        <section className="bg-white rounded-xl border border-gray-100 p-5 mb-5">
+          <h2 className="font-semibold text-[#1c1e3b] mb-4">Workflow Audit Log</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-gray-100 text-left text-gray-400">
+                  <th className="pb-2 pr-4 font-medium w-8">#</th>
+                  <th className="pb-2 pr-4 font-medium">Phase</th>
+                  <th className="pb-2 pr-4 font-medium">Verdict</th>
+                  <th className="pb-2 pr-4 font-medium">Details</th>
+                  <th className="pb-2 font-medium whitespace-nowrap">Time</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {run.auditLogs.map(log => (
+                  <tr key={log.id} className="align-top">
+                    <td className="py-2 pr-4 text-gray-300">{log.iteration}</td>
+                    <td className="py-2 pr-4 font-mono text-[#1c1e3b]">{log.phase}</td>
+                    <td className="py-2 pr-4">
+                      {log.verdict === "PASS" && (
+                        <span className="inline-flex items-center gap-1 text-green-600">
+                          <CheckCircle2 size={11} /> PASS
+                        </span>
+                      )}
+                      {log.verdict === "FAIL" && (
+                        <span className="inline-flex items-center gap-1 text-red-500">
+                          <CircleX size={11} /> FAIL
+                        </span>
+                      )}
+                      {log.verdict === "WARN" && (
+                        <span className="inline-flex items-center gap-1 text-orange-500">
+                          <TriangleAlert size={11} /> WARN
+                        </span>
+                      )}
+                      {!log.verdict && <span className="text-gray-300">—</span>}
+                    </td>
+                    <td className="py-2 pr-4 text-gray-500 max-w-sm">{log.details}</td>
+                    <td className="py-2 text-gray-400 whitespace-nowrap">
+                      {new Date(log.createdAt).toLocaleTimeString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* Dialogue history */}
+      {run.messages.length > 0 && (
+        <section className="bg-white rounded-xl border border-gray-100 p-5 mb-5">
+          <h2 className="font-semibold text-[#1c1e3b] mb-4">Dialogue History</h2>
+          <div className="space-y-4">
+            {run.messages.map(msg => (
+              <div key={msg.id} className={`rounded-lg p-3 ${msg.role === "USER" ? "bg-[#f8fbea] border border-[#b3cc26]/30 ml-8" : "bg-gray-50 border border-gray-100"}`}>
+                <p className="text-xs font-medium mb-1 text-gray-500">
+                  {msg.role === "USER" ? "Your answers" : "Agent analysis"}
+                  <span className="ml-2 font-normal">{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                </p>
+                <pre className="text-xs text-gray-700 font-sans whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
+                  {msg.content}
+                </pre>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Final output */}
       {run.output && (
         <section className="bg-white rounded-xl border border-gray-100 p-5">
-          <h2 className="font-semibold text-[#1c1e3b] mb-3">Final Output</h2>
+          <h2 className="font-semibold text-[#1c1e3b] mb-3">
+            {run.status === "AWAITING_INPUT" ? "Current Brief (Awaiting Input)" : "Final Output"}
+          </h2>
           <pre className="text-sm text-gray-700 font-sans whitespace-pre-wrap leading-relaxed">
             {run.output}
           </pre>
